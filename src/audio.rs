@@ -1,10 +1,8 @@
+use std::time::Duration;
+
 use bevy::prelude::*;
-use bevy::utils::Duration;
 use itertools::izip;
 use rodio::{OutputStream, Sink, Source};
-
-use super::character::CharacterMarker;
-use super::viewpoint::Viewpoint;
 
 pub const FRAME_SIZE: usize = 1024;
 pub const SAMPLING_RATE: usize = 48000;
@@ -101,7 +99,7 @@ pub struct Plugin;
 impl Plugin {
     fn process_frame(
         mut commands: Commands,
-        query_character: Query<(&GlobalTransform, &Viewpoint), With<CharacterMarker>>,
+        query_character: Single<&GlobalTransform, With<Camera3d>>,
         mut query_audio_sources: Query<(Entity, &GlobalTransform, &mut AudioSource)>,
         time: Res<Time>,
         mut audio: ResMut<Audio>,
@@ -109,12 +107,12 @@ impl Plugin {
     ) {
         audio.timer.tick(time.delta());
 
-        let (global_transform, viewpoint) = query_character.single();
-        let listener_position = global_transform.translation() + viewpoint.translation;
+        let transform = query_character.into_inner().compute_transform();
+        let listener_position = transform.translation;
 
-        let listener_orientation_right = viewpoint.rotation * Vec3::X;
-        let listener_orientation_up = viewpoint.rotation * Vec3::Y;
-        let listener_orientation_ahead = viewpoint.rotation * -Vec3::Z;
+        let listener_orientation_right = transform.right();
+        let listener_orientation_up = transform.up();
+        let listener_orientation_ahead = transform.forward();
         let listener_orientation = audionimbus::CoordinateSystem {
             right: audionimbus::Vector3::new(
                 listener_orientation_right.x,

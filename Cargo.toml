@@ -9,9 +9,9 @@ repository = "https://github.com/MaxenceMaire/audionimbus-demo"
 readme = "README.md"
 
 [dependencies]
-audionimbus = "0.6.2"
-bevy = "0.15.3"
-bevy_rapier3d = "0.29.0"
+audionimbus = "0.8"
+bevy = "0.17"
+avian3d = {git = "https://github.com/Jondolf/avian"}
 itertools = "0.14.0"
 rodio = "0.20.1"
 

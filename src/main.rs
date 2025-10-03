@@ -1,18 +1,19 @@
-use bevy::core_pipeline::{bloom::Bloom, tonemapping::Tonemapping};
-use bevy::prelude::*;
-use bevy_rapier3d::prelude::*;
-use std::io::Read;
+use std::io::Read as _;
 
-use bevy::prelude::BuildChildren;
-use bevy::prelude::PluginGroup;
+use bevy::{
+    asset::RenderAssetUsages,
+    mesh::{Indices, PrimitiveTopology},
+    post_process::bloom::Bloom,
+    prelude::*,
+};
+
+use crate::camera_controller::CameraController;
 
 mod audio;
-mod character;
+mod camera_controller;
 mod controls;
 mod cursor;
-mod input;
 mod orbit;
-mod viewpoint;
 
 fn main() {
     let mut app = App::new();
@@ -25,14 +26,11 @@ fn main() {
         }),
         ..Default::default()
     }))
-    .add_plugins(RapierPhysicsPlugin::<NoUserData>::default())
     .add_plugins(cursor::Plugin)
     .add_plugins(controls::Plugin)
-    .add_plugins(input::Plugin)
-    .add_plugins(viewpoint::Plugin)
-    .add_plugins(character::Plugin)
     .add_plugins(audio::Plugin)
     .add_plugins(orbit::Plugin)
+    .add_plugins(camera_controller::CameraControllerPlugin)
     .add_systems(PostStartup, setup);
 
     app.run();
@@ -73,12 +71,6 @@ fn setup(
     .unwrap();
     audio.simulator.add_source(&source);
     audio.simulator.commit();
-
-    let mut spawn_position = Vec3::new(0.0, 0.0, 10.0);
-    let mut viewpoint = viewpoint::Viewpoint {
-        translation: Vec3::new(0.0, 2.0, 0.0),
-        ..Default::default()
-    };
 
     let assets = std::path::Path::new(env!("OUT_DIR")).join("assets");
     let file = std::fs::File::open(assets.join("piano.raw")).unwrap();
@@ -203,8 +195,8 @@ fn setup(
             Mesh3d(
                 meshes.add(
                     Mesh::new(
-                        bevy::render::mesh::PrimitiveTopology::TriangleList,
-                        bevy::asset::RenderAssetUsages::default(),
+                        PrimitiveTopology::TriangleList,
+                        RenderAssetUsages::default(),
                     )
                     .with_inserted_attribute(
                         Mesh::ATTRIBUTE_POSITION,
@@ -213,7 +205,7 @@ fn setup(
                             .map(|vertex| [vertex[1], vertex[2], vertex[0]])
                             .collect::<Vec<_>>(),
                     )
-                    .with_inserted_indices(bevy::render::mesh::Indices::U32(vec![0, 3, 1, 1, 3, 2]))
+                    .with_inserted_indices(Indices::U32(vec![0, 3, 1, 1, 3, 2]))
                     .with_inserted_attribute(
                         Mesh::ATTRIBUTE_NORMAL,
                         vec![normal, normal, normal, normal],
@@ -253,28 +245,12 @@ fn setup(
         ..Default::default()
     });
 
-    commands
-        .spawn(character::Character {
-            viewpoint,
-            rigid_body: bevy_rapier3d::dynamics::RigidBody::KinematicPositionBased,
-            collider: bevy_rapier3d::geometry::Collider::compound(vec![(
-                Vec3::new(0.0, 1.0, 0.0),
-                Quat::IDENTITY,
-                bevy_rapier3d::geometry::Collider::cylinder(1.0, 0.5),
-            )]),
-            transform: bevy::transform::components::Transform::from_translation(spawn_position),
-            ..Default::default()
-        })
-        .with_child((
-            Camera3d::default(),
-            Camera {
-                hdr: true,
-                ..default()
-            },
-            Tonemapping::TonyMcMapface,
-            Bloom::NATURAL,
-            Transform::default(),
-        ));
+    commands.spawn((
+        CameraController::default(),
+        Camera3d::default(),
+        Bloom::NATURAL,
+        Transform::default(),
+    ));
 }
 
 // Blender vertex coordinates
