@@ -18,3 +18,7 @@ rodio = "0.20.1"
 [features]
 direct = []
 reverb = []
+
+[lints.clippy]
+too_many_arguments = "allow"
+type_complexity = "allow"

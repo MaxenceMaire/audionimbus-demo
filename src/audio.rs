@@ -590,20 +590,3 @@ impl bevy::app::Plugin for Plugin {
         app.add_systems(PostUpdate, Self::process_frame);
     }
 }
-
-pub fn sine_wave(
-    frequency: f32,
-    sample_rate: usize,
-    amplitude: f32,
-    num_samples: usize,
-) -> Vec<audionimbus::Sample> {
-    let mut phase: f32 = 0.0;
-    let phase_increment = 2.0 * std::f32::consts::PI * frequency / sample_rate as f32;
-    (0..num_samples)
-        .map(|_| {
-            let sample = amplitude * phase.sin();
-            phase = (phase + phase_increment) % (2.0 * std::f32::consts::PI);
-            sample
-        })
-        .collect()
-}

@@ -11,7 +11,6 @@ use crate::camera_controller::CameraController;
 
 mod audio;
 mod camera_controller;
-mod controls;
 mod cursor;
 mod orbit;
 
@@ -27,7 +26,6 @@ fn main() {
         ..Default::default()
     }))
     .add_plugins(cursor::Plugin)
-    .add_plugins(controls::Plugin)
     .add_plugins(audio::Plugin)
     .add_plugins(orbit::Plugin)
     .add_plugins(camera_controller::CameraControllerPlugin)
@@ -150,8 +148,6 @@ fn setup(
                 ..Default::default()
             },
         ));
-
-        spawn_position = Vec3::new(0.0, 0.0, 15.0);
     }
     #[cfg(feature = "reverb")]
     {
@@ -180,13 +176,6 @@ fn setup(
                 ..Default::default()
             },
         ));
-
-        spawn_position = Vec3::new(0.0, 0.0, 15.0);
-        viewpoint = viewpoint::Viewpoint {
-            translation: Vec3::new(0.0, 2.0, 0.0),
-            pitch: 0.2,
-            ..Default::default()
-        };
     }
 
     for (vertices, normal) in TOPOLOGY {
