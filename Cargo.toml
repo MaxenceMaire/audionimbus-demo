@@ -9,7 +9,7 @@ repository = "https://github.com/MaxenceMaire/audionimbus-demo"
 readme = "README.md"
 
 [dependencies]
-audionimbus = "0.8"
+audionimbus = { version = "0.8", features = ["auto-install"]  }
 bevy = "0.17"
 itertools = "0.14.0"
 rodio = "0.20.1"
