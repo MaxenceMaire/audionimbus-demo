@@ -16,9 +16,9 @@ pub const GAIN_FACTOR_REVERB: f32 = 0.1;
 #[derive(Resource)]
 pub struct Audio {
     pub context: audionimbus::Context,
-    pub settings: audionimbus::AudioSettings,
+
     pub scene: audionimbus::Scene,
-    pub simulator: audionimbus::Simulator,
+    pub simulator: audionimbus::Simulator<audionimbus::Direct, audionimbus::Reflections>,
     pub hrtf: audionimbus::Hrtf,
     pub direct_effect: audionimbus::DirectEffect,
     pub reflection_effect: audionimbus::ReflectionEffect,
@@ -480,24 +480,24 @@ impl bevy::app::Plugin for Plugin {
         scene.add_static_mesh(&walls);
         scene.commit();
 
-        let simulation_settings = audionimbus::SimulationSettings {
-            scene_params: audionimbus::SceneParams::Default,
-            direct_simulation: Some(audionimbus::DirectSimulationSettings {
-                max_num_occlusion_samples: 16,
-            }),
-            reflections_simulation: Some(audionimbus::ReflectionsSimulationSettings::Convolution {
-                max_num_rays: 2048,
-                num_diffuse_samples: 8,
-                max_duration: 2.0,
-                max_order: AMBISONICS_ORDER,
-                max_num_sources: 8,
-                num_threads: 1,
-            }),
-            pathing_simulation: None,
-            sampling_rate: SAMPLING_RATE,
-            frame_size: FRAME_SIZE,
-        };
-        let mut simulator = audionimbus::Simulator::try_new(&context, simulation_settings).unwrap();
+        let mut simulator = audionimbus::Simulator::builder(
+            audionimbus::SceneParams::Default,
+            SAMPLING_RATE,
+            FRAME_SIZE,
+        )
+        .with_direct(audionimbus::DirectSimulationSettings {
+            max_num_occlusion_samples: 16,
+        })
+        .with_reflections(audionimbus::ReflectionsSimulationSettings::Convolution {
+            max_num_rays: 2048,
+            num_diffuse_samples: 8,
+            max_duration: 2.0,
+            max_order: AMBISONICS_ORDER,
+            max_num_sources: 8,
+            num_threads: 1,
+        })
+        .try_build(&context)
+        .unwrap();
         simulator.set_scene(&scene);
         // Listener source used for reverb.
         let listener_source = audionimbus::Source::try_new(
@@ -572,7 +572,6 @@ impl bevy::app::Plugin for Plugin {
 
         app.insert_resource(Audio {
             context,
-            settings,
             scene,
             simulator,
             hrtf,
