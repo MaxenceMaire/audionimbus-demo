@@ -41,4 +41,5 @@ Explore a vast, resonant chamber that demonstrates reverberation and dynamic aco
 ## Controls
 
 - **Movement**: W (forward), A (left), S (backward), D (right)
+- **Move Faster**: Hold Shift
 - **Look around**: Mouse movement
