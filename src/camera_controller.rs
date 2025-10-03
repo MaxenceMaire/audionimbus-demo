@@ -131,9 +131,7 @@ fn run_camera_controller(
     mut windows: Query<(&Window, &mut CursorOptions)>,
     accumulated_mouse_motion: Res<AccumulatedMouseMotion>,
     accumulated_mouse_scroll: Res<AccumulatedMouseScroll>,
-    mouse_button_input: Res<ButtonInput<MouseButton>>,
     key_input: Res<ButtonInput<KeyCode>>,
-    mut toggle_cursor_grab: Local<bool>,
     mut mouse_cursor_grab: Local<bool>,
     mut query: Query<(&mut Transform, &mut CameraController), With<Camera>>,
 ) {
@@ -185,20 +183,9 @@ fn run_camera_controller(
         axis_input.y -= 1.0;
     }
 
-    let mut cursor_grab_change = false;
-    if key_input.just_pressed(controller.keyboard_key_toggle_cursor_grab) {
-        *toggle_cursor_grab = !*toggle_cursor_grab;
-        cursor_grab_change = true;
-    }
-    if mouse_button_input.just_pressed(controller.mouse_key_cursor_grab) {
-        *mouse_cursor_grab = true;
-        cursor_grab_change = true;
-    }
-    if mouse_button_input.just_released(controller.mouse_key_cursor_grab) {
-        *mouse_cursor_grab = false;
-        cursor_grab_change = true;
-    }
-    let cursor_grab = *mouse_cursor_grab || *toggle_cursor_grab;
+    *mouse_cursor_grab = true;
+    let cursor_grab_change = true;
+    let cursor_grab = *mouse_cursor_grab;
 
     if !cursor_grab {
         axis_input = Vec3::ZERO;

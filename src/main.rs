@@ -11,27 +11,21 @@ use crate::camera_controller::CameraController;
 
 mod audio;
 mod camera_controller;
-mod cursor;
-mod orbit;
 
 fn main() {
-    let mut app = App::new();
-
-    app.add_plugins(DefaultPlugins.set(WindowPlugin {
-        primary_window: Some(Window {
-            title: "audionimbus".to_string(),
-            mode: bevy::window::WindowMode::BorderlessFullscreen(MonitorSelection::Primary),
+    App::new()
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            primary_window: Some(Window {
+                title: "audionimbus".to_string(),
+                mode: bevy::window::WindowMode::BorderlessFullscreen(MonitorSelection::Primary),
+                ..Default::default()
+            }),
             ..Default::default()
-        }),
-        ..Default::default()
-    }))
-    .add_plugins(cursor::Plugin)
-    .add_plugins(audio::Plugin)
-    .add_plugins(orbit::Plugin)
-    .add_plugins(camera_controller::CameraControllerPlugin)
-    .add_systems(PostStartup, setup);
-
-    app.run();
+        }))
+        .add_plugins(audio::Plugin)
+        .add_plugins(camera_controller::CameraControllerPlugin)
+        .add_systems(Startup, setup)
+        .run();
 }
 
 fn setup(
@@ -238,7 +232,7 @@ fn setup(
         CameraController::default(),
         Camera3d::default(),
         Bloom::NATURAL,
-        Transform::default(),
+        Transform::from_xyz(-0.45, 2.17, 10.0),
     ));
 }
 
