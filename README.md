@@ -1,5 +1,16 @@
 # AudioNimbus Demo
 
+
+> [!NOTE]  
+>
+> **Note for new users**  
+>
+> If you're looking to use **AudioNimbus** with the **Bevy** game engine, the easiest way to get started is through the [**bevy_steam_audio** plugin](https://github.com/janhohenheim/bevy_steam_audio).  
+> 
+> The plugin provides an up-to-date integration between Bevy and AudioNimbus, with ready-to-run examples in its [`examples/` directory](https://github.com/janhohenheim/bevy_steam_audio/tree/main/examples).  
+> 
+> These examples are maintained alongside recent versions of AudioNimbus and are the recommended starting point for most users.
+
 Experience immersive spatial audio through this interactive demo of [`audionimbus`](https://github.com/MaxenceMaire/audionimbus), a Rust wrapper for Steam Audio's spatial audio capabilities.
 
 Walk through three distinct acoustic environments, each showcasing various spatial audio features of `audionimbus`.
